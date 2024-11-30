@@ -15,7 +15,7 @@ export interface CreateFromPdfOptions {
      * if not given.
      *
      * If `maxPage` is greater than the number of pages in the PDF, all pages
-     * in the PDF will be converted to images.
+     * in the PDF will be converted to screenshots.
      */
     maxPage?: number;
     scaleFactor?: number;
@@ -35,7 +35,7 @@ export interface ResizeOptions {
 }
 export type Handle = string;
 /**
- * Provides imaging functions to resize or process images. You create an image
+ * Provides imaging functions to resize or process screenshots. You create an image
  * using one of the `createFrom` functions, then use the other functions to
  * process the image.
  *
@@ -55,7 +55,7 @@ export default class JoplinImaging {
     private imageByHandle;
     private cacheImage;
     /**
-     * Creates an image from the provided path. Note that images and PDFs are supported. If you
+     * Creates an image from the provided path. Note that screenshots and PDFs are supported. If you
      * provide a URL instead of a local path, the file will be downloaded first then converted to an
      * image.
      */

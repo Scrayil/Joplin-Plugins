@@ -1,5 +1,4 @@
-# Joplin Plugin
+# TOT (Table Of To-Dos)
 
-This is your new Joplin plugin. It is suggested that you use this README file to document your plugin.
-
-For information on how to build or publish the plugin, please see [GENERATOR_DOC.md](./GENERATOR_DOC.md)
+## Demo
+https://github.com/user-attachments/assets/072db679-ff08-410e-acbc-fa7af08ebf66
