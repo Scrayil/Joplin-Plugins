@@ -1,8 +1,9 @@
 # Joplin-Plugins
-This repository will contain useful [Joplin](https://joplinapp.org/) plugins to boost your productivity.
+This repository will contain the source code of several [Joplin](https://joplinapp.org/) plugins that aim to increase our productivity and simplify tedious tasks.
 
-## Repository plugins
+## Plugins overviews
 - [TOT (Table Of To-Dos)](/table_of_todos)
+- ...
 
 ### Other officially supported plugins
 [https://joplinapp.org/plugins/](https://joplinapp.org/plugins/)
