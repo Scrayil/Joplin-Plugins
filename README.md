@@ -4,7 +4,7 @@ This repository will contain useful [Joplin](https://joplinapp.org/) plugins to 
 ## Repository plugins
 - [TOT (Table Of To-Dos)](/table_of_todos)
 
-## Other officially supported plugins
+### Other officially supported plugins
 [https://joplinapp.org/plugins/](https://joplinapp.org/plugins/)
 
 ## License
