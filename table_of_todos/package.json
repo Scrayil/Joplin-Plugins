@@ -13,7 +13,21 @@
   },
   "homepage": "https://github.com/Scrayil",
   "license": "GPL-2.0",
-  "keywords": ["joplin-plugin", "note-taking", "productivity", "study", "school", "lesson", "shortcuts", "toc", "tot", "table of contents", "table of to-dos", "todo", "checklist"],
+  "keywords": [
+    "joplin-plugin",
+    "note-taking",
+    "productivity",
+    "study",
+    "school",
+    "lesson",
+    "shortcuts",
+    "toc",
+    "tot",
+    "table of contents",
+    "table of to-dos",
+    "todo",
+    "checklist"
+  ],
   "files": [
     "publish"
   ],
