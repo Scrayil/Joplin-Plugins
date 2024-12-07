@@ -7,11 +7,7 @@ This option can be tweaked in the settings.
 
 ## Demo
 ### Basic Usage
-<video controls>
-  <source src="https://github.com/user-attachments/assets/072db679-ff08-410e-acbc-fa7af08ebf66" type="video/mp4">
-</video>
+https://github.com/user-attachments/assets/072db679-ff08-410e-acbc-fa7af08ebf66
 
 ### Parent-Child logic
-<video controls>
-  <source src="https://github.com/user-attachments/assets/463ffd6b-2743-4b1d-a0a7-9a5f73fa316a" type="video/mp4">
-</video>
+https://github.com/user-attachments/assets/463ffd6b-2743-4b1d-a0a7-9a5f73fa316a

@@ -18,7 +18,7 @@ export const registerSettings = async () => {
             section: 'table_of_todos_settings',
             public: true,
             label: 'Heading Level',
-            description: "Set the maximum heading level to consider for TOT notes. Note that lists with more than 4 nested levels can't be properly rendered.",
+            description: "Set the maximum heading level to consider for TOT notes. Note that lists with more than four nested levels can't be properly rendered. ℹ️ This takes effect after editing source notes or creating new TOTs.",
         },
         'parent_child': {
             value: true,
