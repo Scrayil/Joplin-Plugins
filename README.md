@@ -2,7 +2,7 @@
 This repository will contain the source code of several [Joplin](https://joplinapp.org/) plugins that aim to increase our productivity and simplify tedious tasks.
 
 ## Plugin details
-- [TOT (Table Of To-Dos)](/table_of_todos)
+- [TOT (Table Of To-Dos)](/table_of_todos) - [Changelog](/table_of_todos/CHANGELOG.md)
 - ...
 
 ### Other officially supported plugins
