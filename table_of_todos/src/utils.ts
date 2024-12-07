@@ -1,4 +1,6 @@
+import joplin from 'api';
 const uslug = require('@joplin/fork-uslug');
+
 
 // From https://stackoverflow.com/a/6234804/561309
 function escapeHtml(unsafe:string) {
@@ -37,18 +39,134 @@ function headerSlug(headerText:string) {
     return output.join('-');
 }
 
-export function generateTotMd(note) {
+// This function determines the heading level of each line in the TOT's note
+function getHeadingLevelFromTotLine(line:string):number {
+    for (let i = 0; i < line.length; i++) {
+        if(line[i] !== "\t") return i;
+    }
+}
+
+// This function toggles all the note's checkboxes to reflect the main TOT's state
+function setAllCheckboxes(mark:boolean, totLines: string[]):string[] {
+    const initialCheckBoxState = mark ? "- [ ]" : "- [x]";
+    const finalCheckboxState = mark ? "- [x]" : "- [ ]";
+    for(let i = 0; i < totLines.length; i++) {
+        totLines[i] = totLines[i].replace(initialCheckBoxState, finalCheckboxState);
+    }
+    return totLines;
+}
+
+// This function toggles all the subheadings' checkboxes based onto their parents
+function setSubheadingCheckboxes(mark:boolean, leadingLineIndex:number, lines:string[]):string[] {
+    const finalLines = lines;
+    const initialCheckBoxState = mark ? "- [ ]" : "- [x]";
+    const finalCheckboxState = mark ? "- [x]" : "- [ ]";
+   // Leading lines are relative to subheadings' parents, and they enforce their checkboxes' statuses
+    const leadingLineLevel = getHeadingLevelFromTotLine(lines[leadingLineIndex]);
+    // Iterates over all the possible subheadings of the currently leading one, but skips the already evaluated subheadings
+    for (let j= leadingLineIndex + 1; j < lines.length; j++) {
+        const currTotLineLevel = getHeadingLevelFromTotLine(lines[j]);
+        if(currTotLineLevel > leadingLineLevel) {
+            // Updates the finalLines and not the lines object to avoid altering the original state
+            finalLines[j] = lines[j].replace(initialCheckBoxState, finalCheckboxState);
+        } else if (currTotLineLevel <= leadingLineLevel) {
+            break;
+        }
+    }
+    return finalLines;
+}
+
+// This function ensures that a parent checkbox change is reflected in all its subheadings
+export function updateTotNoteCheckboxes(totNote):string {
+    let totLines = totNote.body.split("\n");
+    const cachedTotNoteState = getCachedTotNotesStates()[totNote.id];
+    if(cachedTotNoteState) {
+        const currentTotNoteState = getStateObjectFromTotNote(totNote);
+        // Checks if the main TOT's checkbox has been toggled
+        if(cachedTotNoteState["{NOTE_CHECKED}"] !== currentTotNoteState["{NOTE_CHECKED}"]) {
+            totLines = setAllCheckboxes(currentTotNoteState["{NOTE_CHECKED}"], totLines);
+        // Manage checkbox changes happened inside the note
+        } else {
+            // This function can be triggered only if the currently selected note is a TOT.
+            // And we also have an event handler for note changes that updates the TOTs cached versions.
+            // We can assume that the keys in the states are exactly the same at this point.
+            let changedLineIndex = -1;
+            let changedLineChecked = false;
+            Object.keys(currentTotNoteState).forEach((headingLnk:string) => {
+                if(changedLineIndex === -1 && cachedTotNoteState[headingLnk].checked !== currentTotNoteState[headingLnk].checked) {
+                    changedLineIndex = currentTotNoteState[headingLnk].lineIdx;
+                    changedLineChecked = currentTotNoteState[headingLnk].checked;
+                }
+            });
+
+            if(changedLineIndex > -1) {
+                totLines = setSubheadingCheckboxes(changedLineChecked, changedLineIndex, totLines);
+            }
+        }
+    }
+
+    return totLines.join("\n");
+}
+
+// This function is responsible for generating the TOT note corresponding to the given note's content
+export async function generateTotMarkdown(note) {
     let mdString = ""
     const headers = noteHeaders(note.body);
     if(headers.length == 0) return -1;
+    let prevHeadingIndentation = -1;
     for (const header of headers) {
-        // Skips smaller headers since Joplin does not render their checkboxes
-        if(header.level > 4) continue;
+        // Skips higher headings values;
+        if(header.level > (await joplin.settings.values("max_heading_level"))["max_heading_level"]) continue;
         const slug = headerSlug(header.text);
-        for (let i = 0; i < header.level - 1; i++) {
+        // Automatically fixes format issues where notes headings are placed wrongly.
+        // (subheadings must have higher or equal levels of their parent,
+        // and main headings should normally start with level 1)
+        // e.g. Wrong format:
+        // ## Main heading
+        // # Subheading
+        // ### Sub-Subheading
+        const currIndentation = Math.min(header.level - 1, prevHeadingIndentation + 1)
+        for (let i = 0; i < currIndentation; i++) {
             mdString += "\t"
         }
+        prevHeadingIndentation = currIndentation;
         mdString += `- [ ] [${escapeHtml(header.text)}](:/${note.id}#${escapeHtml(slug)})\n`;
     }
     return mdString;
+}
+
+// This function extracts all checkbox states from the given TOT note
+function getStateObjectFromTotNote(totNote):object {
+    const totNoteStates = {};
+    const totNoteLines = totNote.body.trim().split("\n");
+    for (let i = 0; i < totNoteLines.length; i++) {
+        const currLine = totNoteLines[i];
+        // Regex to capture the heading unique link
+        const headingName = currLine.match(/(\(:\/.*\))/)[1].replace("(:/", "").replace(")", "");
+        totNoteStates[headingName] = {checked: currLine.indexOf("[x]") > -1, lineIdx: i};
+    }
+    totNoteStates["{NOTE_CHECKED}"] = totNote.todo_completed > 0;
+    return totNoteStates;
+}
+
+// This function is responsible for effectively caching the given TOT notes' states
+export function cacheTotNotesState(totNote):string {
+    try {
+        const cachedTotNotes = getCachedTotNotesStates()
+        cachedTotNotes[totNote.id] = getStateObjectFromTotNote(totNote);
+        sessionStorage.setItem("table_of_todos_cachedTotNotes", JSON.stringify(cachedTotNotes));
+    } catch (error) {
+        console.error(error);
+        return "Unable to cache TOT note: " + error.message;
+    }
+    return null;
+}
+
+// This function is responsible for retrieving the cached TOT notes' states
+export function getCachedTotNotesStates():object {
+    const cachedTotNotes = sessionStorage.getItem("table_of_todos_cachedTotNotes")
+    if(cachedTotNotes) {
+        return JSON.parse(cachedTotNotes);
+    }
+    return {};
 }

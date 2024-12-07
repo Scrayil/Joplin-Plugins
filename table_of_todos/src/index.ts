@@ -1,36 +1,26 @@
 import joplin from 'api';
-import {MenuItemLocation} from 'api/types';
-import {manageTotNote} from "./tot_note";
+import {manageTotNotes, manageTotNotesStates} from "./tot_note";
+import {registerSettings} from "./settings";
+import {registerJoplinCommands} from "./pluginCommands";
 
 
 joplin.plugins.register({
 	onStart: async function() {
-		// As soon as the current note changes, this updates the related TOT note content
+		// As soon as the current note changes, this updates the related TOT content
 		await joplin.workspace.onNoteChange(async () => {
-			await manageTotNote(true);
+			await manageTotNotes(true);
 		});
 
-		// Registers a command that creates the TOT note.
-		// This is triggered by the below button's click
-		await joplin.commands.register({
-			name: 'createTotNote',
-			label: 'Create TOT note',
-			iconName: 'fas fa-check-square',
-			execute: async () => {
-				const totNoteId = await manageTotNote(false);
-				if(totNoteId.length > 0) {
-					await joplin.commands.execute('openNote', totNoteId);
-				}
-			},
+		// As soon as a TOT note is selected, saves it's content for later
+		await joplin.workspace.onNoteSelectionChange(async () => {
+			await manageTotNotesStates();
 		});
 
-		// Adds also a context menu entry for the note editor, to generate the corresponding TOT
-		await joplin.views.menuItems.create('noteEditorContextTotMenu', 'createTotNote', MenuItemLocation.EditorContextMenu, {accelerator: 'Ctrl+Alt+Space'});
-		// Adds also a menu entry to generate a TOT note in the main toolbar under "Note"
-		await joplin.views.menus.create('toolbarToolsTotMenu', 'TOT (Table Of To-Dos)', [{
-			commandName: 'createTotNote',
-			accelerator: 'Ctrl+Alt+Space'
-		}], MenuItemLocation.Note);
+		// Registering the plugin's settings
+		await registerSettings();
+
+		// Registering commands and related menu options
+		await  registerJoplinCommands()
 	},
 })
 .then(_ => console.info("TOT Plugin registered successfully!"))
