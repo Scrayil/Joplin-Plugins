@@ -7,7 +7,7 @@
 	"description": "Allows you to generate the table of contents related to a specific note, where each item has a checkbox. Especially useful for students, as it helps keep track of topics and distinguish those learned from those not yet learned.",
 	"author": "Mattia Bennati (Scrayil)",
 	"homepage_url": "https://github.com/Scrayil",
-	"repository_url": "https://github.com/Scrayil/Joplin-Plugins/Table_Of_Todos",
+	"repository_url": "https://github.com/Scrayil/Joplin-Plugins/table_of_todos",
 	"keywords": ["joplin-plugin", "note-taking", "productivity", "study", "school", "lesson", "shortcuts", "toc", "tot", "table of contents", "table of to-dos", "todo", "checklist"],
 	"categories": ["productivity", "integrations", "viewer", "editor", "personal knowledge management"],
 	"screenshots": [
